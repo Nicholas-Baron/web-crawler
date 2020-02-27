@@ -22,6 +22,23 @@ public class Main {
     static Map<String, Integer> wordCounts = new HashMap<>();
 
     static void countWords(Document doc) {
+        String docBody = doc.body().text();
+        String[] words = docBody.split(" ");
+        for(String word : words){
+            if(wordCounts.containsKey(word)){
+                wordCounts.put(word, wordCounts.get(word)+1);
+            }
+            else{
+                wordCounts.put(word,1); //add new element if not seen before
+            }
+
+        }
+
+        // if(!hashmap.contains(word)){
+//  add word to hashmap
+//  else()
+//  hashmap.get(word)
+// ,ap.put(key, map.get(key) + 1);
 
     }
 
