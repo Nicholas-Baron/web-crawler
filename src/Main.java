@@ -12,24 +12,26 @@ import java.util.Queue;
 
 public class Main {
 
-    static final int crawlSize = 100;
-    static int numberOfDocs = 1;
-    // Seed language
-    static String crawlLanguage = null;
-    static Queue<String> frontier = new ArrayDeque<>();
+    private static final int crawlSize = 100;
+    private static int numberOfDocs = 1;
 
-    static Map<String, Integer> outlinkCount = new HashMap<>(crawlSize);
-    static Map<String, Integer> wordCounts = new HashMap<>();
+    // Seed language
+    private static String crawlLanguage = null;
+    // Queue of URLs to read
+    private static Queue<String> frontier = new ArrayDeque<>();
+    // Each URL with its links out
+    private static Map<String, Integer> outlinkCount = new HashMap<>(crawlSize);
+    // A count of each word
+    private static Map<String, Integer> wordCounts = new HashMap<>();
 
     static void countWords(Document doc) {
         String docBody = doc.body().text();
         String[] words = docBody.split(" ");
-        for(String word : words){
-            if(wordCounts.containsKey(word)){
-                wordCounts.put(word, wordCounts.get(word)+1);
-            }
-            else{
-                wordCounts.put(word,1); //add new element if not seen before
+        for (String word : words) {
+            if (wordCounts.containsKey(word)) {
+                wordCounts.put(word, wordCounts.get(word) + 1);
+            } else {
+                wordCounts.put(word, 1); //add new element if not seen before
             }
 
         }
