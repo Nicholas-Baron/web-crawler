@@ -1,4 +1,5 @@
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -19,7 +20,7 @@ public class Main {
         // Read document
 
         while(!frontier.isEmpty() && numberOfDocs < 100) {
-            var currentDoc = Jsoup.connect(frontier.poll()).get();
+            Document currentDoc = Jsoup.connect(frontier.poll()).get();
             Elements urls = currentDoc.select("a[href]");
             for(Element url : urls){
                 frontier.add(url.absUrl("href"));
