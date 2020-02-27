@@ -89,9 +89,13 @@ public class Main {
         }
 
         // Dump CSV at end
-
         PrintWriter writer = new PrintWriter("report.csv");
         outlinkCount.forEach((key, value) -> writer.println(key + "," + value));
         writer.close();
+
+        // Dump word counts
+        PrintWriter counts = new PrintWriter("word_frequencies.csv");
+        wordCounts.forEach((key, value) -> counts.println(key + ',' + value));
+        counts.close();
     }
 }
