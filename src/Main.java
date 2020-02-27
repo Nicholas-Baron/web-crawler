@@ -13,7 +13,6 @@ import java.util.Queue;
 public class Main {
 
     private static final int crawlSize = 100;
-    private static int numberOfDocs = 1;
 
     // Seed language
     private static String crawlLanguage = null;
@@ -26,7 +25,8 @@ public class Main {
 
     static void countWords(Document doc) {
         String docBody = doc.body().text();
-        String[] words = docBody.split("[^A-ZÃƒâ€¦Ãƒâ€žÃƒâ€“a-zÃƒÂ¥ÃƒÂ¤ÃƒÂ¶]+");
+        String[] words = docBody.split(
+                "[^A-ZÃƒâ€¦Ãƒâ€žÃƒâ€“a-zÃƒÂ¥ÃƒÂ¤ÃƒÂ¶]+");
         for (String word : words) {
             if (wordCounts.containsKey(word)) {
                 wordCounts.put(word, wordCounts.get(word) + 1);
@@ -58,7 +58,7 @@ public class Main {
         // Read in seed URL
         frontier.add(args[0]);
 
-        while (!frontier.isEmpty() && numberOfDocs < crawlSize) {
+        while (!frontier.isEmpty() && outlinkCount.size() < crawlSize) {
 
             // Read document
             String currentUrl = frontier.poll();
@@ -69,9 +69,7 @@ public class Main {
 
             // Check language
             // Reject if not found or incorrect
-            if (!acceptDocument(currentDoc)) {continue;} else {
-                numberOfDocs++;
-            }
+            if (!acceptDocument(currentDoc) || outlinkCount.containsKey(currentUrl)) {continue;}
 
             System.out.println("Accepting " + currentUrl);
 
