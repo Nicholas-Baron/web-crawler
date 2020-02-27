@@ -26,6 +26,7 @@ public class Main {
             // Read document
             String currentUrl = frontier.poll();
             Document currentDoc = Jsoup.connect(currentUrl).get();
+
             Elements urls = currentDoc.select("a[href]");
 
             // Check language
