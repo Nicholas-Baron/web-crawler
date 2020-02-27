@@ -29,14 +29,18 @@ public class Main {
 
             Elements urls = currentDoc.select("a[href]");
 
+            numberOfDocs++;
+
             // Check language
             // Reject if not found or incorrect
 
             // Enqueue links in document
             for (Element url : urls) {
                 frontier.add(url.absUrl("href"));
-                numberOfDocs++;
+//                numberOfDocs++;
             }
+            String lang = currentDoc.getElementsByTag("html").attr("lang");
+            System.out.println(lang);
 
             // Record count to CSV
             outlinkCount.put(currentUrl, urls.size());
