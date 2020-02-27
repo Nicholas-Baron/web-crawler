@@ -26,7 +26,7 @@ public class Main {
 
     static void countWords(Document doc) {
         String docBody = doc.body().text();
-        String[] words = docBody.split(" ");
+        String[] words = docBody.split("[^A-ZÃƒâ€¦Ãƒâ€žÃƒâ€“a-zÃƒÂ¥ÃƒÂ¤ÃƒÂ¶]+");
         for (String word : words) {
             if (wordCounts.containsKey(word)) {
                 wordCounts.put(word, wordCounts.get(word) + 1);
