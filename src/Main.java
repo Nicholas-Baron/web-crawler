@@ -12,18 +12,32 @@ import java.util.Queue;
 
 public class Main {
 
+    static final int crawlSize = 100;
+    static int numberOfDocs = 1;
+    // Seed language
+    static String crawlLanguage = null;
+    static Queue<String> frontier = new ArrayDeque<>();
+
+    static Map<String, Integer> outlinkCount = new HashMap<>(crawlSize);
+    static Map<String, Integer> wordCounts = new HashMap<>();
+
+    static void countWords(Document doc) {
+
+    }
+
+    static boolean acceptDocument(Document doc) {
+        String lang = doc.getElementsByTag("html").attr("lang");
+        if (crawlLanguage == null) {
+            crawlLanguage = lang;
+            System.out.println("Language set to " + crawlLanguage);
+            return true;
+        } else { return crawlLanguage.equalsIgnoreCase(lang); }
+    }
+
     public static void main(String[] args) throws IOException {
 
-        int numberOfDocs = 1;
-        final int crawlSize = 100;
         // Read in seed URL
-
-        // Seed language
-        String crawlLanguage = null;
-        Queue<String> frontier = new ArrayDeque<>();
         frontier.add(args[0]);
-
-        Map<String, Integer> outlinkCount = new HashMap<>(crawlSize);
 
         while (!frontier.isEmpty() && numberOfDocs < crawlSize) {
 
@@ -34,30 +48,25 @@ public class Main {
             System.out.println("Downloading " + currentUrl);
             Document currentDoc = Jsoup.connect(currentUrl).get();
 
-            Elements urls = currentDoc.select("a[href]");
-
-            numberOfDocs++;
-
             // Check language
-            String lang = currentDoc.getElementsByTag("html").attr("lang");
-            if (crawlLanguage == null) {
-                crawlLanguage = lang;
-                System.out.println("Language set to " + crawlLanguage);
-            } else if (!crawlLanguage.equalsIgnoreCase(lang)) {
-                System.out.println("Rejecting " + currentUrl);
-                continue;
+            // Reject if not found or incorrect
+            if (!acceptDocument(currentDoc)) {continue;} else {
+                numberOfDocs++;
             }
 
             System.out.println("Accepting " + currentUrl);
-            // Reject if not found or incorrect
 
             // Enqueue links in document
+            Elements urls = currentDoc.select("a[href]");
             for (Element url : urls) {
                 frontier.add(url.absUrl("href"));
             }
 
             // Record count to CSV
             outlinkCount.put(currentUrl, urls.size());
+
+            // Count word frequencies
+            countWords(currentDoc);
         }
 
         // Dump CSV at end
