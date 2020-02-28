@@ -50,12 +50,25 @@ public class Main {
         } else { return crawlLanguage.equalsIgnoreCase(lang); }
     }
 
+    // Alphabetical
     static List<String> sortedURLReport() {
 
+        List<String> sortedURLEntries = new ArrayList<>(outlinkCount.size());
+        outlinkCount.forEach((key, value) -> sortedURLEntries.add(key + ", " + value));
+        Collections.sort(sortedURLEntries);
+        return sortedURLEntries;
     }
 
+    // Numerical
     static List<String> sortedWordCount() {
 
+        List<String> sortedWordCount = new ArrayList<>(wordCounts.size());
+        wordCounts.entrySet()      // get the entries in the map
+                  .stream()         // read them one by one
+                  .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort the stream
+                  .forEachOrdered(entry -> sortedWordCount
+                          .add(entry.getKey() + ", " + entry.getValue())); // insert into arraylist
+        return sortedWordCount;
     }
 
     public static void main(String[] args) throws IOException {
@@ -95,12 +108,12 @@ public class Main {
 
         // Dump CSV at end
         PrintWriter writer = new PrintWriter("report.csv");
-        outlinkCount.forEach((key, value) -> writer.println(key + "," + value));
+        sortedURLReport().forEach(entry -> writer.println(entry));
         writer.close();
 
         // Dump word counts
         PrintWriter counts = new PrintWriter("word_frequencies.csv");
-        wordCounts.forEach((key, value) -> counts.println(key + ',' + value));
+        sortedWordCount().forEach(entry -> counts.println(entry));
         counts.close();
     }
 }
