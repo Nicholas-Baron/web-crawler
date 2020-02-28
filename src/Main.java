@@ -104,6 +104,8 @@ public class Main {
 
             // Count word frequencies
             countWords(currentDoc);
+
+            System.out.println(frontier.size() + " items in the queue");
         }
 
         // Dump CSV at end
