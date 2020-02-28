@@ -5,10 +5,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class Main {
 
@@ -51,6 +48,14 @@ public class Main {
             System.out.println("Language set to " + crawlLanguage);
             return true;
         } else { return crawlLanguage.equalsIgnoreCase(lang); }
+    }
+
+    static List<String> sortedURLReport() {
+
+    }
+
+    static List<String> sortedWordCount() {
+
     }
 
     public static void main(String[] args) throws IOException {
