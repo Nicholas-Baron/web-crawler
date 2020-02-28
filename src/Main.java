@@ -62,6 +62,7 @@ public class Main {
 
             // Read document
             String currentUrl = frontier.poll();
+            if (currentUrl.contains("#")) currentUrl = currentUrl.substring(0, currentUrl.indexOf("#"));
             if (currentUrl.isEmpty() || currentUrl.endsWith("ogg") || outlinkCount.containsKey(currentUrl)) continue;
 
             System.out.println("Downloading " + currentUrl);
