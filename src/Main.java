@@ -71,6 +71,14 @@ public class Main {
         return sortedWordCount;
     }
 
+    //Format URL
+    private static String formatURL(String raw)
+    {
+        if (raw.contains("#")) raw = raw.substring(0, raw.indexOf("#"));
+        if (raw.contains("?")) raw = raw.substring(0, raw.indexOf("?"));
+        return raw;
+    }
+
     public static void main(String[] args) throws IOException {
 
         // Read in seed URL
@@ -79,9 +87,7 @@ public class Main {
         while (!frontier.isEmpty() && outlinkCount.size() < crawlSize) {
 
             // Read document
-            String currentUrl = frontier.poll();
-            if (currentUrl.contains("#")) currentUrl = currentUrl.substring(0, currentUrl.indexOf("#"));
-            if (currentUrl.contains("?")) currentUrl = currentUrl.substring(0, currentUrl.indexOf("?"));
+            String currentUrl = formatURL(frontier.poll());
             if (currentUrl.isEmpty() || currentUrl.endsWith("ogg") || currentUrl.endsWith("php")|| outlinkCount.containsKey(currentUrl)) continue;
 
             System.out.println("Downloading " + currentUrl);
