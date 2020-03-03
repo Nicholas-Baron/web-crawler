@@ -23,8 +23,7 @@ public class Main {
     private static Map<String, Integer> wordCounts = new HashMap<>();
 
     private static void countWords(Document doc) {
-        String docBody = doc.body().text();
-        String[] words = docBody.split(
+        String[] words = doc.body().text().split(
                 "[^\\u0041-\\u005A\\u0061-\\u007A\\u00AA\\u00B5\\u00BA\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02C1"
                 + "\\u02C6-\\u02D1\\u02E0-\\u02E4\\u02EC\\u02EE\\u0370-\\u0374\\u0376\\u0377\\u037A-\\u037D\\u0386"
                 + "\\u0388-\\u038A\\u038C\\u038E-\\u03A1\\u03A3-\\u03F5\\u03F7-\\u0481\\u048A-\\u0527\\u0531-\\u0556"
@@ -82,9 +81,7 @@ public class Main {
             } else {
                 wordCounts.put(word, 1); //add new element if not seen before
             }
-
         }
-
     }
 
     private static boolean acceptDocument(Document doc) {
