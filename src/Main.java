@@ -96,13 +96,17 @@ public class Main {
         } else { return crawlLanguage.equalsIgnoreCase(lang); }
     }
 
+    private static <K, V> String toCSV(Map.Entry<K, V> entry) {
+        return entry.getKey() + " , " + entry.getValue();
+    }
+
     // Alphabetical
-    public static List<String> sortedURLReport() {
+    private static List<String> sortedURLReport() {
 
         return outlinkCount.entrySet()
                            .stream()
                            .sorted(Map.Entry.comparingByKey())
-                           .map(entry -> entry.getKey() + ", " + entry.getValue())
+                           .map(Main::toCSV)
                            .collect(Collectors.toList());
     }
 
@@ -112,9 +116,8 @@ public class Main {
         return wordCounts.entrySet()      // get the entries in the map
                          .stream()         // read them one by one
                          .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort the stream
-                         .map(entry -> entry.getKey() + ", " + entry.getValue())
-                         .collect(Collectors.toCollection(
-                                 () -> new ArrayList<>(wordCounts.size()))); // insert into arraylist
+                         .map(Main::toCSV)
+                         .collect(Collectors.toList()); // insert into arraylist
     }
 
     //Format URL: takes out special queries and tags
