@@ -125,8 +125,10 @@ public class Main {
 
     //Checks if URL is valid: not an invalid filetype, is not repeated from root URL, and begins w/HTTP
     private static boolean acceptURL(String url) {
-        return !url.isEmpty() && !url.endsWith("ogg") && !url.endsWith("php") && !outlinkCount.containsKey(url) && url
-                .startsWith("http");
+        return !url.isEmpty()
+               && !url.endsWith("ogg") && !url.endsWith("php") && !url.endsWith("jpg")
+               && !outlinkCount.containsKey(url)
+               && url.startsWith("http");
     }
 
     private static void saveDataToFile(String filename, List<String> data) {
