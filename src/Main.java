@@ -72,11 +72,15 @@ public class Main {
     }
 
     //Format URL
-    private static String formatURL(String raw)
-    {
+    private static String formatURL(String raw) {
         if (raw.contains("#")) raw = raw.substring(0, raw.indexOf("#"));
         if (raw.contains("?")) raw = raw.substring(0, raw.indexOf("?"));
         return raw;
+    }
+
+    private static boolean acceptURL(String url) {
+
+        return !url.isEmpty() && !url.endsWith("ogg") && !url.endsWith("php") && !outlinkCount.containsKey(url);
     }
 
     public static void main(String[] args) throws IOException {
@@ -88,7 +92,7 @@ public class Main {
 
             // Read document
             String currentUrl = formatURL(frontier.poll());
-            if (currentUrl.isEmpty() || currentUrl.endsWith("ogg") || currentUrl.endsWith("php")|| outlinkCount.containsKey(currentUrl)) continue;
+            if (!acceptURL(currentUrl)) continue;
 
             System.out.println("Downloading " + currentUrl);
             Document currentDoc = Jsoup.connect(currentUrl).get();
