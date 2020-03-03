@@ -99,10 +99,11 @@ public class Main {
     // Alphabetical
     public static List<String> sortedURLReport() {
 
-        List<String> sortedURLEntries = new ArrayList<>(outlinkCount.size());
-        outlinkCount.forEach((key, value) -> sortedURLEntries.add(key + ", " + value));
-        Collections.sort(sortedURLEntries);
-        return sortedURLEntries;
+        return outlinkCount.entrySet()
+                           .stream()
+                           .sorted(Map.Entry.comparingByKey())
+                           .map(entry -> entry.getKey() + ", " + entry.getValue())
+                           .collect(Collectors.toList());
     }
 
     // Numerical
