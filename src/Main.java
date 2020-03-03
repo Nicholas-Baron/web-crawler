@@ -91,8 +91,7 @@ public class Main {
         while (!frontier.isEmpty() && outlinkCount.size() < crawlSize) {
 
             // Read document
-            String currentUrl = formatURL(frontier.poll());
-            if (!acceptURL(currentUrl)) continue;
+            String currentUrl = frontier.poll();
 
             System.out.println("Downloading " + currentUrl);
             Document currentDoc = Jsoup.connect(currentUrl).get();
@@ -106,7 +105,8 @@ public class Main {
             // Enqueue links in document
             Elements urls = currentDoc.select("a[href]");
             for (Element url : urls) {
-                frontier.add(url.absUrl("href"));
+                String urlToAdd = formatURL(url.absUrl("href"));
+                if (acceptURL(urlToAdd)) frontier.add(urlToAdd);
             }
 
             // Record count to CSV
