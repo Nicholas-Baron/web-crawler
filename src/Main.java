@@ -158,6 +158,7 @@ public class Main {
 
             // Read document
             String currentUrl = frontier.poll();
+            if (!acceptURL(currentUrl)) continue;
 
             System.out.println("Downloading " + currentUrl);
             Document currentDoc = nextAcceptedDocument(currentUrl);
