@@ -169,7 +169,7 @@ public class Main {
 
             // Check language
             // Reject if not found or incorrect
-            if (currentDoc == null || !acceptDocument(currentDoc)) {continue;}
+            if (currentDoc == null || !acceptDocument(currentDoc)) continue;
 
             System.out.println("Accepting " + currentUrl);
 
