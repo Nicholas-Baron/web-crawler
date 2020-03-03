@@ -3,6 +3,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -83,6 +84,17 @@ public class Main {
         return !url.isEmpty() && !url.endsWith("ogg") && !url.endsWith("php") && !outlinkCount.containsKey(url);
     }
 
+    private static void saveDataToFile(String filename, List<String> data) {
+        try {
+            PrintWriter writer = new PrintWriter(filename);
+            sortedWordCount().forEach(writer::println);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not save data to file " + filename);
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) throws IOException {
 
         // Read in seed URL
@@ -123,13 +135,9 @@ public class Main {
         }
 
         // Dump CSV at end
-        PrintWriter writer = new PrintWriter("report.csv");
-        sortedURLReport().forEach(entry -> writer.println(entry));
-        writer.close();
+        saveDataToFile("report.csv", sortedURLReport());
 
         // Dump word counts
-        PrintWriter counts = new PrintWriter("word_frequencies.csv");
-        sortedWordCount().forEach(entry -> counts.println(entry));
-        counts.close();
+        saveDataToFile("word_frequencies.csv", sortedWordCount());
     }
 }
