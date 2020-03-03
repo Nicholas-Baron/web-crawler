@@ -116,13 +116,14 @@ public class Main {
                                  () -> new ArrayList<>(wordCounts.size()))); // insert into arraylist
     }
 
-    //Format URL
+    //Format URL: takes out special queries and tags
     private static String formatURL(String raw) {
         if (raw.contains("#")) raw = raw.substring(0, raw.indexOf("#"));
         if (raw.contains("?")) raw = raw.substring(0, raw.indexOf("?"));
         return raw;
     }
 
+    //Checks if URL is valid: not an invalid filetype, is not repeated from root URL, and begins w/HTTP
     private static boolean acceptURL(String url) {
         return !url.isEmpty() && !url.endsWith("ogg") && !url.endsWith("php") && !outlinkCount.containsKey(url) && url
                 .startsWith("http");
