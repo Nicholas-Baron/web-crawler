@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -57,13 +58,12 @@ public class Main {
     // Numerical
     private static List<String> sortedWordCount() {
 
-        List<String> sortedWordCount = new ArrayList<>(wordCounts.size());
-        wordCounts.entrySet()      // get the entries in the map
-                  .stream()         // read them one by one
-                  .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort the stream
-                  .forEachOrdered(entry -> sortedWordCount
-                          .add(entry.getKey() + ", " + entry.getValue())); // insert into arraylist
-        return sortedWordCount;
+        return wordCounts.entrySet()      // get the entries in the map
+                         .stream()         // read them one by one
+                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort the stream
+                         .map(entry -> entry.getKey() + ", " + entry.getValue())
+                         .collect(Collectors.toCollection(
+                                 () -> new ArrayList<>(wordCounts.size()))); // insert into arraylist
     }
 
     //Format URL
