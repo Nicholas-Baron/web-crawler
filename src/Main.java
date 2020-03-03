@@ -124,8 +124,8 @@ public class Main {
     }
 
     private static boolean acceptURL(String url) {
-
-        return !url.isEmpty() && !url.endsWith("ogg") && !url.endsWith("php") && !outlinkCount.containsKey(url);
+        return !url.isEmpty() && !url.endsWith("ogg") && !url.endsWith("php") && !outlinkCount.containsKey(url) && url
+                .startsWith("http");
     }
 
     private static void saveDataToFile(String filename, List<String> data) {
