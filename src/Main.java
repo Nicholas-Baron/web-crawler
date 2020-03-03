@@ -21,7 +21,7 @@ public class Main {
     // A count of each word
     private static Map<String, Integer> wordCounts = new HashMap<>();
 
-    static void countWords(Document doc) {
+    private static void countWords(Document doc) {
         String docBody = doc.body().text();
         String[] words = docBody.split(
                 "[^A-ZÃƒâ€¦Ãƒâ€žÃƒâ€“a-zÃƒÂ¥ÃƒÂ¤ÃƒÂ¶]+");
@@ -34,15 +34,9 @@ public class Main {
 
         }
 
-        // if(!hashmap.contains(word)){
-//  add word to hashmap
-//  else()
-//  hashmap.get(word)
-// ,ap.put(key, map.get(key) + 1);
-
     }
 
-    static boolean acceptDocument(Document doc) {
+    private static boolean acceptDocument(Document doc) {
         String lang = doc.getElementsByTag("html").attr("lang");
         if (crawlLanguage == null) {
             crawlLanguage = lang;
@@ -52,7 +46,7 @@ public class Main {
     }
 
     // Alphabetical
-    static List<String> sortedURLReport() {
+    public static List<String> sortedURLReport() {
 
         List<String> sortedURLEntries = new ArrayList<>(outlinkCount.size());
         outlinkCount.forEach((key, value) -> sortedURLEntries.add(key + ", " + value));
@@ -61,7 +55,7 @@ public class Main {
     }
 
     // Numerical
-    static List<String> sortedWordCount() {
+    private static List<String> sortedWordCount() {
 
         List<String> sortedWordCount = new ArrayList<>(wordCounts.size());
         wordCounts.entrySet()      // get the entries in the map
