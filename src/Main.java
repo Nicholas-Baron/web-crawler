@@ -104,13 +104,17 @@ public class Main {
 
             // Enqueue links in document
             Elements urls = currentDoc.select("a[href]");
+            int acceptedURLCount = 0;
             for (Element url : urls) {
                 String urlToAdd = formatURL(url.absUrl("href"));
-                if (acceptURL(urlToAdd)) frontier.add(urlToAdd);
+                if (acceptURL(urlToAdd)) {
+                    frontier.add(urlToAdd);
+                    acceptedURLCount++;
+                }
             }
 
             // Record count to CSV
-            outlinkCount.put(currentUrl, urls.size());
+            outlinkCount.put(currentUrl, acceptedURLCount);
 
             // Count word frequencies
             countWords(currentDoc);
