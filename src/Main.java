@@ -98,7 +98,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         // Read in seed URL
-        frontier.add(args[0]);
+        frontier.add(formatURL(args[0]));
 
         while (!frontier.isEmpty() && outlinkCount.size() < crawlSize) {
 
