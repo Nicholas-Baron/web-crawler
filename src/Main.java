@@ -81,7 +81,7 @@ public class Main {
     private static void saveDataToFile(String filename, List<String> data) {
         try {
             PrintWriter writer = new PrintWriter(filename);
-            sortedWordCount().forEach(writer::println);
+            data.forEach(writer::println);
             writer.close();
         } catch (FileNotFoundException e) {
             System.out.println("Could not save data to file " + filename);
