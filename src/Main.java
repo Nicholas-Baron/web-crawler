@@ -178,11 +178,12 @@ public class Main {
             int acceptedURLCount = 0;
             for (Element url : urls) {
                 String urlToAdd = formatURL(url.absUrl("href"));
-                if (acceptURL(urlToAdd)) {
+                if (!urlToAdd.equalsIgnoreCase(currentUrl) && acceptURL(urlToAdd)) {
                     frontier.add(urlToAdd);
                     acceptedURLCount++;
                 }
             }
+            System.out.println("Added " + acceptedURLCount + " items to the queue");
 
             // Record count to CSV
             outlinkCount.put(currentUrl, acceptedURLCount);
