@@ -95,7 +95,17 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    private static Document nextAcceptedDocument(String url) {
+        try {
+            return Jsoup.connect(url).get();
+        } catch (IOException e) {
+            System.out.println("Could not download " + url);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
 
         // Read in seed URL
         frontier.add(formatURL(args[0]));
@@ -106,11 +116,11 @@ public class Main {
             String currentUrl = frontier.poll();
 
             System.out.println("Downloading " + currentUrl);
-            Document currentDoc = Jsoup.connect(currentUrl).get();
+            Document currentDoc = nextAcceptedDocument(currentUrl);
 
             // Check language
             // Reject if not found or incorrect
-            if (!acceptDocument(currentDoc)) {continue;}
+            if (currentDoc == null || !acceptDocument(currentDoc)) {continue;}
 
             System.out.println("Accepting " + currentUrl);
 
