@@ -18,7 +18,7 @@ public class Main {
     // Queue of URLs to read
     private static Queue<String> frontier = new ArrayDeque<>();
     // Each URL with its links out
-    private static Map<String, ArrayList<String>> outlinkCount = new HashMap<>(crawlSize);
+    private static Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
     // A count of each word
     private static Map<String, Integer> wordCounts = new HashMap<>();
 
@@ -100,11 +100,11 @@ public class Main {
     // Alphabetical
     private static List<String> sortedURLReport() {
 
-        return outlinkCount.entrySet()
-                           .stream()
-                           .sorted(Map.Entry.comparingByKey())
-                           .map(Main::toCSV)
-                           .collect(Collectors.toList());
+        return outlinks.entrySet()
+                       .stream()
+                       .sorted(Map.Entry.comparingByKey())
+                       .map(Main::toCSV)
+                       .collect(Collectors.toList());
     }
 
     // Numerical
@@ -128,7 +128,7 @@ public class Main {
     private static boolean acceptURL(String url) {
         return !url.isEmpty()
                && !url.endsWith("ogg") && !url.endsWith("php") && !url.endsWith("jpg")
-               && !outlinkCount.containsKey(url)
+               && !outlinks.containsKey(url)
                && url.startsWith("http");
     }
 
@@ -158,7 +158,7 @@ public class Main {
         // Read in seed URL
         frontier.add(formatURL(args[0]));
 
-        while (!frontier.isEmpty() && outlinkCount.size() < crawlSize) {
+        while (!frontier.isEmpty() && outlinks.size() < crawlSize) {
 
             // Read document
             String currentUrl = frontier.poll();
@@ -175,23 +175,23 @@ public class Main {
 
             // Enqueue links in document
             Elements urls = currentDoc.select("a[href]");
-            outlinkCount.put(currentUrl, new ArrayList<>());
+            outlinks.put(currentUrl, new ArrayList<>());
             for (Element url : urls) {
                 String urlToAdd = formatURL(url.absUrl("href"));
                 if (!urlToAdd.equalsIgnoreCase(currentUrl) && acceptURL(urlToAdd)) {
                     frontier.add(urlToAdd);
 
                     // Record links out of page to CSV
-                    outlinkCount.get(currentUrl).add(urlToAdd);
+                    outlinks.get(currentUrl).add(urlToAdd);
                 }
             }
-            System.out.println("Added " + outlinkCount.get(currentUrl).size() + " items to the queue");
+            System.out.println("Added " + outlinks.get(currentUrl).size() + " items to the queue");
 
             // Count word frequencies
             countWords(currentDoc);
 
             System.out.println(frontier.size() + " items in the queue");
-            System.out.println(outlinkCount.size() + " sites downloaded");
+            System.out.println(outlinks.size() + " sites downloaded");
         }
 
         // Dump CSV at end
