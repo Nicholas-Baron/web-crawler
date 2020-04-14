@@ -18,7 +18,7 @@ public class Main {
     // Queue of URLs to read
     private static Queue<String> frontier = new ArrayDeque<>();
     // Each URL with its links out
-    private static Map<String, Integer> outlinkCount = new HashMap<>(crawlSize);
+    private static Map<String, ArrayList<String>> outlinkCount = new HashMap<>(crawlSize);
     // A count of each word
     private static Map<String, Integer> wordCounts = new HashMap<>();
 
@@ -175,18 +175,17 @@ public class Main {
 
             // Enqueue links in document
             Elements urls = currentDoc.select("a[href]");
-            int acceptedURLCount = 0;
+            outlinkCount.put(currentUrl, new ArrayList<>());
             for (Element url : urls) {
                 String urlToAdd = formatURL(url.absUrl("href"));
                 if (!urlToAdd.equalsIgnoreCase(currentUrl) && acceptURL(urlToAdd)) {
                     frontier.add(urlToAdd);
-                    acceptedURLCount++;
+
+                    // Record links out of page to CSV
+                    outlinkCount.get(currentUrl).add(urlToAdd);
                 }
             }
-            System.out.println("Added " + acceptedURLCount + " items to the queue");
-
-            // Record count to CSV
-            outlinkCount.put(currentUrl, acceptedURLCount);
+            System.out.println("Added " + outlinkCount.get(currentUrl).size() + " items to the queue");
 
             // Count word frequencies
             countWords(currentDoc);
