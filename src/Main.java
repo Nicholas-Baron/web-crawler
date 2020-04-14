@@ -169,18 +169,20 @@ public class Main {
 
             System.out.println("Accepting " + currentUrl);
 
-            // Enqueue links in document
             Elements urls = currentDoc.select("a[href]");
-            outlinks.put(currentUrl, new ArrayList<>());
-            for (Element url : urls) {
-                String urlToAdd = formatURL(url.absUrl("href"));
-                if (!urlToAdd.equalsIgnoreCase(currentUrl) && acceptURL(urlToAdd)) {
-                    frontier.add(urlToAdd);
 
-                    // Record links out of page to CSV
-                    outlinks.get(currentUrl).add(urlToAdd);
-                }
-            }
+            ArrayList<String> processedLinks = urls.stream()
+                                                   .map(url -> formatURL(url.absUrl("href")))
+                                                   .filter(urlToAdd -> !urlToAdd
+                                                           .equalsIgnoreCase(currentUrl)
+                                                                       && acceptURL(urlToAdd))
+                                                   .collect(Collectors.toCollection(ArrayList::new));
+
+            // Enqueue links in document
+            frontier.addAll(processedLinks);
+            outlinks.put(currentUrl, processedLinks);
+
+            // Record links out of page to CSV
             System.out.println("Added " + outlinks.get(currentUrl).size() + " items to the queue");
 
             // Count word frequencies
