@@ -93,17 +93,13 @@ public class Main {
         } else { return crawlLanguage.equalsIgnoreCase(lang); }
     }
 
-    private static <K, V> String toCSV(Map.Entry<K, V> entry) {
-        return entry.getKey() + " , " + entry.getValue();
-    }
-
     // Alphabetical
     private static List<String> sortedURLReport() {
 
         return outlinks.entrySet()
                        .stream()
                        .sorted(Map.Entry.comparingByKey())
-                       .map(Main::toCSV)
+                       .map(entry -> entry.getKey() + " , " + entry.getValue().size())
                        .collect(Collectors.toList());
     }
 
@@ -113,7 +109,7 @@ public class Main {
         return wordCounts.entrySet()      // get the entries in the map
                          .stream()         // read them one by one
                          .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort the stream
-                         .map(Main::toCSV)
+                         .map(entry -> entry.getKey() + " , " + entry.getValue())
                          .collect(Collectors.toList()); // insert into arraylist
     }
 
