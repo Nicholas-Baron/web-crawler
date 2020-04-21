@@ -15,11 +15,11 @@ public class Main {
     // Seed language
     private static String crawlLanguage = null;
     // Queue of URLs to read
-    private static Queue<String> frontier = new ArrayDeque<>();
+    private static final Queue<String> frontier = new ArrayDeque<>();
     // Each URL with its links out
-    private static Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
+    private static final Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
     // A count of each word
-    private static Map<String, Integer> wordCounts = new HashMap<>();
+    private static final Map<String, Integer> wordCounts = new HashMap<>();
 
     private static void countWords(Document doc) {
         String[] words = doc.body().text().split(
