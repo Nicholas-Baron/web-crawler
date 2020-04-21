@@ -148,6 +148,10 @@ public class Main {
         }
     }
 
+    private static void pageRank(){
+        //
+    }
+
     public static void main(String[] args) {
 
         // Read in seed URL
@@ -196,5 +200,7 @@ public class Main {
 
         // Dump word counts
         saveDataToFile("word_frequencies.csv", sortedWordCount());
+
+        pageRank();
     }
 }
