@@ -171,10 +171,10 @@ public class Main {
             Elements urls = currentDoc.select("a[href]");
 
             ArrayList<String> processedLinks = urls.stream()
-                                                   .map(url -> formatURL(url.absUrl("href")))
+                                                   .map(url -> formatURL(url.absUrl("href"))) // format URL to remove hashtags and question marks
                                                    .filter(urlToAdd -> !urlToAdd
                                                            .equalsIgnoreCase(currentUrl)
-                                                                       && acceptURL(urlToAdd))
+                                                                       && acceptURL(urlToAdd)) // remove duplicate URLs
                                                    .collect(Collectors.toCollection(ArrayList::new));
 
             // Enqueue links in document
