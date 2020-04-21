@@ -138,6 +138,21 @@ public class Main {
         }
     }
 
+    private static Map<String, ArrayList<String>> inlinkMap() {
+        Map<String, ArrayList<String>> to_ret = new HashMap<>(outlinks.size());
+
+        for (String url : outlinks.keySet()) {
+            to_ret.put(url, outlinks.entrySet().stream()
+                                    // Read only the entries which have the URL as an outlink
+                                    .filter(entry -> entry.getValue().contains(url))
+                                    .map(Map.Entry::getKey) // get the URL of said entry
+                                    .collect(Collectors.toCollection(ArrayList::new))
+            );
+        }
+
+        return to_ret;
+    }
+
     private static Document nextAcceptedDocument(String url) {
         try {
             return Jsoup.connect(url).get();
