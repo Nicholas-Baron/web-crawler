@@ -1,6 +1,5 @@
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.FileNotFoundException;
@@ -18,7 +17,7 @@ public class Main {
     // Queue of URLs to read
     private static Queue<String> frontier = new ArrayDeque<>();
     // Each URL with its links out
-    private static Map<String, Integer> outlinkCount = new HashMap<>(crawlSize);
+    private static Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
     // A count of each word
     private static Map<String, Integer> wordCounts = new HashMap<>();
 
@@ -93,18 +92,14 @@ public class Main {
         } else { return crawlLanguage.equalsIgnoreCase(lang); }
     }
 
-    private static <K, V> String toCSV(Map.Entry<K, V> entry) {
-        return entry.getKey() + " , " + entry.getValue();
-    }
-
     // Alphabetical
     private static List<String> sortedURLReport() {
 
-        return outlinkCount.entrySet()
-                           .stream()
-                           .sorted(Map.Entry.comparingByKey())
-                           .map(Main::toCSV)
-                           .collect(Collectors.toList());
+        return outlinks.entrySet()
+                       .stream()
+                       .sorted(Map.Entry.comparingByKey())
+                       .map(entry -> entry.getKey() + " , " + entry.getValue().size())
+                       .collect(Collectors.toList());
     }
 
     // Numerical
@@ -113,7 +108,7 @@ public class Main {
         return wordCounts.entrySet()      // get the entries in the map
                          .stream()         // read them one by one
                          .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())) // sort the stream
-                         .map(Main::toCSV)
+                         .map(entry -> entry.getKey() + " , " + entry.getValue())
                          .collect(Collectors.toList()); // insert into arraylist
     }
 
@@ -128,7 +123,7 @@ public class Main {
     private static boolean acceptURL(String url) {
         return !url.isEmpty()
                && !url.endsWith("ogg") && !url.endsWith("php") && !url.endsWith("jpg")
-               && !outlinkCount.containsKey(url)
+               && !outlinks.containsKey(url)
                && url.startsWith("http");
     }
 
@@ -158,7 +153,7 @@ public class Main {
         // Read in seed URL
         frontier.add(formatURL(args[0]));
 
-        while (!frontier.isEmpty() && outlinkCount.size() < crawlSize) {
+        while (!frontier.isEmpty() && outlinks.size() < crawlSize) {
 
             // Read document
             String currentUrl = frontier.poll();
@@ -173,26 +168,27 @@ public class Main {
 
             System.out.println("Accepting " + currentUrl);
 
-            // Enqueue links in document
             Elements urls = currentDoc.select("a[href]");
-            int acceptedURLCount = 0;
-            for (Element url : urls) {
-                String urlToAdd = formatURL(url.absUrl("href"));
-                if (!urlToAdd.equalsIgnoreCase(currentUrl) && acceptURL(urlToAdd)) {
-                    frontier.add(urlToAdd);
-                    acceptedURLCount++;
-                }
-            }
-            System.out.println("Added " + acceptedURLCount + " items to the queue");
 
-            // Record count to CSV
-            outlinkCount.put(currentUrl, acceptedURLCount);
+            ArrayList<String> processedLinks = urls.stream()
+                                                   .map(url -> formatURL(url.absUrl("href"))) // format URL to remove hashtags and question marks
+                                                   .filter(urlToAdd -> !urlToAdd
+                                                           .equalsIgnoreCase(currentUrl)
+                                                                       && acceptURL(urlToAdd)) // remove duplicate URLs
+                                                   .collect(Collectors.toCollection(ArrayList::new));
+
+            // Enqueue links in document
+            frontier.addAll(processedLinks);
+            outlinks.put(currentUrl, processedLinks);
+
+            // Record links out of page to CSV
+            System.out.println("Added " + outlinks.get(currentUrl).size() + " items to the queue");
 
             // Count word frequencies
             countWords(currentDoc);
 
             System.out.println(frontier.size() + " items in the queue");
-            System.out.println(outlinkCount.size() + " sites downloaded");
+            System.out.println(outlinks.size() + " sites downloaded");
         }
 
         // Dump CSV at end
