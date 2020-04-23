@@ -15,11 +15,11 @@ public class Main {
     // Seed language
     private static String crawlLanguage = null;
     // Queue of URLs to read
-    private static Queue<String> frontier = new ArrayDeque<>();
+    private static final Queue<String> frontier = new ArrayDeque<>();
     // Each URL with its links out
-    private static Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
+    private static final Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
     // A count of each word
-    private static Map<String, Integer> wordCounts = new HashMap<>();
+    private static final Map<String, Integer> wordCounts = new HashMap<>();
 
     private static void countWords(Document doc) {
         String[] words = doc.body().text().split(
@@ -138,6 +138,21 @@ public class Main {
         }
     }
 
+    private static Map<String, ArrayList<String>> inlinkMap() {
+        Map<String, ArrayList<String>> to_ret = new HashMap<>(outlinks.size());
+
+        for (String url : outlinks.keySet()) {
+            to_ret.put(url, outlinks.entrySet().stream()
+                                    // Read only the entries which have the URL as an outlink
+                                    .filter(entry -> entry.getValue().contains(url))
+                                    .map(Map.Entry::getKey) // get the URL of said entry
+                                    .collect(Collectors.toCollection(ArrayList::new))
+            );
+        }
+
+        return to_ret;
+    }
+
     private static Document nextAcceptedDocument(String url) {
         try {
             return Jsoup.connect(url).get();
@@ -175,10 +190,11 @@ public class Main {
             Elements urls = currentDoc.select("a[href]");
 
             ArrayList<String> processedLinks = urls.stream()
-                                                   .map(url -> formatURL(url.absUrl("href"))) // format URL to remove hashtags and question marks
-                                                   .filter(urlToAdd -> !urlToAdd
-                                                           .equalsIgnoreCase(currentUrl)
-                                                                       && acceptURL(urlToAdd)) // remove duplicate URLs
+                                                   // Format URL to remove hashtags and question marks
+                                                   .map(url -> formatURL(url.absUrl("href")))
+                                                   // Remove duplicate URLs
+                                                   .filter(urlToAdd -> !urlToAdd.equalsIgnoreCase(currentUrl)
+                                                                       && acceptURL(urlToAdd))
                                                    .collect(Collectors.toCollection(ArrayList::new));
 
             // Enqueue links in document
