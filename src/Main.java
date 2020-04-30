@@ -164,7 +164,76 @@ public class Main {
     }
 
     private static void pageRank(){
-        //
+
+        double defaultRank = 0.25;
+        double epsilon = 0.01;
+
+        Map<String, Double> pageRanks = new HashMap<>();
+        Map<String, Double> pageRanksUpdated = new HashMap<>();
+
+        for(String url : outlinks.keySet()){
+            pageRanks.put(url, defaultRank);
+        }
+
+
+        Map<String, ArrayList<String>> inlinks = inlinkMap();
+
+
+        while(true) {
+
+            for (String currentUrl : outlinks.keySet()) { // loops through every url
+
+                double sum = 0;
+                for (String inlink : inlinks.get(currentUrl)) { // loop through inlink of currentUrl
+                    sum += (pageRanks.get(inlink)) / outlinks.get(inlink).size();
+                }
+                sum = (0.2/outlinks.size()) + (1-0.2)*sum;
+                pageRanksUpdated.put(currentUrl, sum);
+
+            }
+
+            //if(pageRanks.equals(pageRanksUpdated)) break;
+
+            /*
+            *   1. iterate over every entry in the updatedHashmap
+            *   2. compare the entry's value with the previous hashmap.
+            *   3. store the absolute value of the difference.
+            *   4. If the minimum is smaller than a certain threshold value (epsilon), we shall break.
+            *
+            *
+             */
+
+            Map<String, Double> tempPageRanks = pageRanks;
+            double min = pageRanksUpdated.entrySet().stream().map(entry -> {
+                double oldValue = tempPageRanks.get(entry.getKey());
+                return Math.abs(entry.getValue() - oldValue);
+            }).max(Double::compareTo).orElse(0.0);
+
+            if(min < epsilon){
+                break;
+            }
+            else{
+                pageRanks = copyMap(pageRanksUpdated);
+            }
+
+        }
+
+        pageRanksUpdated.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .forEachOrdered(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
+
+
+    }
+
+    public static Map<String, Double> copyMap(Map<String, Double> map){
+        Map<String, Double> copy = new HashMap<>();
+        for(Map.Entry<String, Double> entry : map.entrySet()){
+            String key = entry.getKey();
+            Double value = entry.getValue();
+            copy.put(key,value);
+        }
+
+        return copy;
     }
 
     public static void main(String[] args) {
