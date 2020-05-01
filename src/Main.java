@@ -180,12 +180,13 @@ public class Main {
 
         while (true) {
 
-            for (String currentUrl : outlinks.keySet()) { // loops through every url
+            final Map<String, Double> tempPageRanks = pageRanks;
+            for (String currentUrl : outlinks.keySet()) {
 
-                double sum = 0;
-                for (String inlink : inlinks.get(currentUrl)) { // loop through inlink of currentUrl
-                    sum += pageRanks.get(inlink) / outlinks.get(inlink).size();
-                }
+                double sum = inlinks.get(currentUrl).stream()
+                                    .map(inlink -> tempPageRanks.get(inlink) / outlinks.get(inlink).size())
+                                    .reduce(0.0, Double::sum);
+
                 sum = (lambda / outlinks.size()) + (1 - lambda) * sum;
                 pageRanksUpdated.put(currentUrl, sum);
 
@@ -198,17 +199,12 @@ public class Main {
              *   4. If the minimum is smaller than a certain threshold value (epsilon), we shall break.
              */
 
-            final Map<String, Double> tempPageRanks = pageRanks;
-            final double min = pageRanksUpdated.entrySet().stream().map(entry -> {
-                double oldValue = tempPageRanks.get(entry.getKey());
-                return Math.abs(entry.getValue() - oldValue);
-            }).max(Double::compareTo).orElse(0.0);
+            final double min = pageRanksUpdated.entrySet().stream()
+                                               .map(entry -> Math
+                                                       .abs(entry.getValue() - tempPageRanks.get(entry.getKey())))
+                                               .max(Double::compareTo).orElse(0.0);
 
-            if (min < epsilon) {
-                break;
-            } else {
-                pageRanks = copyMap(pageRanksUpdated);
-            }
+            if (min < epsilon) { break; } else { pageRanks = copyMap(pageRanksUpdated); }
 
         }
 
