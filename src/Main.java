@@ -163,7 +163,7 @@ public class Main {
         }
     }
 
-    private static void pageRank(){
+    private static void pageRank() {
 
         double defaultRank = 0.25;
         double epsilon = 0.01;
@@ -171,36 +171,30 @@ public class Main {
         Map<String, Double> pageRanks = new HashMap<>();
         Map<String, Double> pageRanksUpdated = new HashMap<>();
 
-        for(String url : outlinks.keySet()){
+        for (String url : outlinks.keySet()) {
             pageRanks.put(url, defaultRank);
         }
 
-
         Map<String, ArrayList<String>> inlinks = inlinkMap();
 
-
-        while(true) {
+        while (true) {
 
             for (String currentUrl : outlinks.keySet()) { // loops through every url
 
                 double sum = 0;
                 for (String inlink : inlinks.get(currentUrl)) { // loop through inlink of currentUrl
-                    sum += (pageRanks.get(inlink)) / outlinks.get(inlink).size();
+                    sum += pageRanks.get(inlink) / outlinks.get(inlink).size();
                 }
-                sum = (0.2/outlinks.size()) + (1-0.2)*sum;
+                sum = (0.2 / outlinks.size()) + (1 - 0.2) * sum;
                 pageRanksUpdated.put(currentUrl, sum);
 
             }
 
-            //if(pageRanks.equals(pageRanksUpdated)) break;
-
             /*
-            *   1. iterate over every entry in the updatedHashmap
-            *   2. compare the entry's value with the previous hashmap.
-            *   3. store the absolute value of the difference.
-            *   4. If the minimum is smaller than a certain threshold value (epsilon), we shall break.
-            *
-            *
+             *   1. iterate over every entry in the updatedHashmap
+             *   2. compare the entry's value with the previous hashmap.
+             *   3. store the absolute value of the difference.
+             *   4. If the minimum is smaller than a certain threshold value (epsilon), we shall break.
              */
 
             Map<String, Double> tempPageRanks = pageRanks;
@@ -209,10 +203,9 @@ public class Main {
                 return Math.abs(entry.getValue() - oldValue);
             }).max(Double::compareTo).orElse(0.0);
 
-            if(min < epsilon){
+            if (min < epsilon) {
                 break;
-            }
-            else{
+            } else {
                 pageRanks = copyMap(pageRanksUpdated);
             }
 
@@ -222,15 +215,14 @@ public class Main {
                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                         .forEachOrdered(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
 
-
     }
 
-    public static Map<String, Double> copyMap(Map<String, Double> map){
+    public static Map<String, Double> copyMap(Map<String, Double> map) {
         Map<String, Double> copy = new HashMap<>();
-        for(Map.Entry<String, Double> entry : map.entrySet()){
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
             String key = entry.getKey();
             Double value = entry.getValue();
-            copy.put(key,value);
+            copy.put(key, value);
         }
 
         return copy;
