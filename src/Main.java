@@ -15,11 +15,11 @@ public class Main {
     // Seed language
     private static String crawlLanguage = null;
     // Queue of URLs to read
-    private static Queue<String> frontier = new ArrayDeque<>();
+    private static final Queue<String> frontier = new ArrayDeque<>();
     // Each URL with its links out
-    private static Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
+    private static final Map<String, ArrayList<String>> outlinks = new HashMap<>(crawlSize);
     // A count of each word
-    private static Map<String, Integer> wordCounts = new HashMap<>();
+    private static final Map<String, Integer> wordCounts = new HashMap<>();
 
     private static void countWords(Document doc) {
         String[] words = doc.body().text().split(
@@ -138,6 +138,21 @@ public class Main {
         }
     }
 
+    private static Map<String, ArrayList<String>> inlinkMap() {
+        Map<String, ArrayList<String>> to_ret = new HashMap<>(outlinks.size());
+
+        for (String url : outlinks.keySet()) {
+            to_ret.put(url, outlinks.entrySet().stream()
+                                    // Read only the entries which have the URL as an outlink
+                                    .filter(entry -> entry.getValue().contains(url))
+                                    .map(Map.Entry::getKey) // get the URL of said entry
+                                    .collect(Collectors.toCollection(ArrayList::new))
+            );
+        }
+
+        return to_ret;
+    }
+
     private static Document nextAcceptedDocument(String url) {
         try {
             return Jsoup.connect(url).get();
@@ -146,6 +161,85 @@ public class Main {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static void pageRank() {
+
+        final double defaultRank = 0.25;
+        final double epsilon = 0.01;
+
+        // From the PageRank slides
+        final double lambda = 0.2;
+
+        final Map<String, ArrayList<String>> inlinks = inlinkMap();
+
+        Map<String, Double> pageRanks = new HashMap<>(inlinks.size());
+        Map<String, Double> pageRanksUpdated = new HashMap<>(inlinks.size());
+
+        for (String url : outlinks.keySet()) pageRanks.put(url, defaultRank);
+
+        while (true) {
+
+            final Map<String, Double> tempPageRanks = pageRanks;
+            for (String currentUrl : outlinks.keySet()) {
+
+                // Compute the basic pagerank (summation of pageranks divided by the outlink count)
+                double sum = inlinks.get(currentUrl).stream()
+                                    .map(inlink -> tempPageRanks.get(inlink) / outlinks.get(inlink).size())
+                                    .reduce(0.0, Double::sum);
+
+                sum = (lambda / outlinks.size()) + (1 - lambda) * sum;
+                pageRanksUpdated.put(currentUrl, sum);
+
+            }
+
+            /*
+             *   1. iterate over every entry in the updatedHashmap
+             *   2. compare the entry's value with the previous hashmap.
+             *   3. store the absolute value of the difference.
+             *   4. If the minimum is smaller than a certain threshold value (epsilon), we shall break.
+             */
+
+            final double min = pageRanksUpdated.entrySet().stream()
+                                               .map(entry -> Math
+                                                       .abs(entry.getValue() - tempPageRanks.get(entry.getKey())))
+                                               .max(Double::compareTo).orElse(0.0);
+
+            if (min < epsilon) { break; } else { pageRanks = copyMap(pageRanksUpdated); }
+
+        }
+
+        // Get the min and max pageranks to do normalization
+
+        double min = pageRanksUpdated.values().stream()
+                                     .min(Double::compareTo)
+                                     .orElse(0.0);
+
+        double max = pageRanksUpdated.values().stream()
+                                     .max(Double::compareTo)
+                                     .orElse(0.0);
+
+        for (String key : pageRanksUpdated.keySet()) {
+            double oldValue = pageRanksUpdated.get(key);
+            pageRanksUpdated.put(key, (oldValue - min) / (max - min));
+        }
+
+        // Print the pagerank sorted with largest rank first
+        pageRanksUpdated.entrySet().stream()
+                        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                        .forEachOrdered(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
+
+    }
+
+    public static Map<String, Double> copyMap(Map<String, Double> map) {
+        Map<String, Double> copy = new HashMap<>();
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Double value = entry.getValue();
+            copy.put(key, value);
+        }
+
+        return copy;
     }
 
     public static void main(String[] args) {
@@ -171,10 +265,11 @@ public class Main {
             Elements urls = currentDoc.select("a[href]");
 
             ArrayList<String> processedLinks = urls.stream()
-                                                   .map(url -> formatURL(url.absUrl("href"))) // format URL to remove hashtags and question marks
-                                                   .filter(urlToAdd -> !urlToAdd
-                                                           .equalsIgnoreCase(currentUrl)
-                                                                       && acceptURL(urlToAdd)) // remove duplicate URLs
+                                                   // Format URL to remove hashtags and question marks
+                                                   .map(url -> formatURL(url.absUrl("href")))
+                                                   // Remove duplicate URLs
+                                                   .filter(urlToAdd -> !urlToAdd.equalsIgnoreCase(currentUrl)
+                                                                       && acceptURL(urlToAdd))
                                                    .collect(Collectors.toCollection(ArrayList::new));
 
             // Enqueue links in document
@@ -196,5 +291,7 @@ public class Main {
 
         // Dump word counts
         saveDataToFile("word_frequencies.csv", sortedWordCount());
+
+        pageRank();
     }
 }
