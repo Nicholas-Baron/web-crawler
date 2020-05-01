@@ -165,17 +165,18 @@ public class Main {
 
     private static void pageRank() {
 
-        double defaultRank = 0.25;
-        double epsilon = 0.01;
+        final double defaultRank = 0.25;
+        final double epsilon = 0.01;
 
-        Map<String, Double> pageRanks = new HashMap<>();
-        Map<String, Double> pageRanksUpdated = new HashMap<>();
+        // From the PageRank slides
+        final double lambda = 0.2;
 
-        for (String url : outlinks.keySet()) {
-            pageRanks.put(url, defaultRank);
-        }
+        final Map<String, ArrayList<String>> inlinks = inlinkMap();
 
-        Map<String, ArrayList<String>> inlinks = inlinkMap();
+        Map<String, Double> pageRanks = new HashMap<>(inlinks.size());
+        Map<String, Double> pageRanksUpdated = new HashMap<>(inlinks.size());
+
+        for (String url : outlinks.keySet()) pageRanks.put(url, defaultRank);
 
         while (true) {
 
@@ -185,7 +186,7 @@ public class Main {
                 for (String inlink : inlinks.get(currentUrl)) { // loop through inlink of currentUrl
                     sum += pageRanks.get(inlink) / outlinks.get(inlink).size();
                 }
-                sum = (0.2 / outlinks.size()) + (1 - 0.2) * sum;
+                sum = (lambda / outlinks.size()) + (1 - lambda) * sum;
                 pageRanksUpdated.put(currentUrl, sum);
 
             }
@@ -197,8 +198,8 @@ public class Main {
              *   4. If the minimum is smaller than a certain threshold value (epsilon), we shall break.
              */
 
-            Map<String, Double> tempPageRanks = pageRanks;
-            double min = pageRanksUpdated.entrySet().stream().map(entry -> {
+            final Map<String, Double> tempPageRanks = pageRanks;
+            final double min = pageRanksUpdated.entrySet().stream().map(entry -> {
                 double oldValue = tempPageRanks.get(entry.getKey());
                 return Math.abs(entry.getValue() - oldValue);
             }).max(Double::compareTo).orElse(0.0);
