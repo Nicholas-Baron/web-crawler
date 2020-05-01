@@ -183,6 +183,7 @@ public class Main {
             final Map<String, Double> tempPageRanks = pageRanks;
             for (String currentUrl : outlinks.keySet()) {
 
+                // Compute the basic pagerank (summation of pageranks divided by the outlink count)
                 double sum = inlinks.get(currentUrl).stream()
                                     .map(inlink -> tempPageRanks.get(inlink) / outlinks.get(inlink).size())
                                     .reduce(0.0, Double::sum);
@@ -208,6 +209,8 @@ public class Main {
 
         }
 
+        // Get the min and max pageranks to do normalization
+
         double min = pageRanksUpdated.values().stream()
                                      .min(Double::compareTo)
                                      .orElse(0.0);
@@ -221,6 +224,7 @@ public class Main {
             pageRanksUpdated.put(key, (oldValue - min) / (max - min));
         }
 
+        // Print the pagerank sorted with largest rank first
         pageRanksUpdated.entrySet().stream()
                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                         .forEachOrdered(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
