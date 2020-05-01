@@ -211,6 +211,19 @@ public class Main {
 
         }
 
+        double min = pageRanksUpdated.values().stream()
+                                     .min(Double::compareTo)
+                                     .orElse(0.0);
+
+        double max = pageRanksUpdated.values().stream()
+                                     .max(Double::compareTo)
+                                     .orElse(0.0);
+
+        for (String key : pageRanksUpdated.keySet()) {
+            double oldValue = pageRanksUpdated.get(key);
+            pageRanksUpdated.put(key, (oldValue - min) / (max - min));
+        }
+
         pageRanksUpdated.entrySet().stream()
                         .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                         .forEachOrdered(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
